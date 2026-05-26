@@ -1,0 +1,181 @@
+﻿@model PlcCopilotAI.Models.PlcRequest
+
+<div style="min-height:100vh; background:#0f172a; padding:35px;">
+    <div style="max-width:1500px; margin:0 auto;">
+
+        <div style="text-align:center; color:white; margin-bottom:35px;">
+            <h1 style="font-size:46px; font-weight:800; margin-bottom:10px;">
+                PLC Copilot AI
+            </h1>
+
+            <p style="font-size:18px; color:#cbd5e1;">
+                Yapay zeka destekli PLC analiz ve kod üretim paneli
+            </p>
+        </div>
+
+        <div style="display:grid; grid-template-columns:420px 1fr; gap:28px; align-items:start;">
+
+            <div style="background:white; border-radius:22px; padding:28px; box-shadow:0 20px 40px rgba(0,0,0,.25);">
+
+                <h2 style="margin-bottom:18px; font-weight:800; color:#0f172a;">
+                    PLC Senaryosu
+                </h2>
+
+                <form asp-controller="Plc"
+                      asp-action="Generate"
+                      method="post">
+
+                    <textarea asp-for="Scenario"
+                              rows="14"
+                              style="width:100%;
+                    border:1px solid #cbd5e1;
+                    border-radius:16px;
+                    padding:18px;
+                    font-size:16px;
+                    resize:vertical;"
+                              placeholder="Örnek: 3 motorlu konveyör sistemi istiyorum. Sensör ürün görünce çalışsın. 20 adet ürün sayılınca dursun. Acil stop ve alarm olsun."></textarea>
+
+                    <button type="submit"
+                            style="width:100%;
+                        margin-top:18px;
+                        padding:16px;
+                        border:none;
+                        border-radius:16px;
+                        background:#2563eb;
+                        color:white;
+                        font-weight:800;
+                        font-size:17px;
+                        cursor:pointer;">
+
+                        PLC Kodu Üret
+
+                    </button>
+
+                </form>
+
+            </div>
+
+            <div style="background:white;
+                border-radius:22px;
+                overflow:hidden;
+                box-shadow:0 20px 40px rgba(0,0,0,.25);">
+
+                <div style="background:#111827;
+                    color:white;
+                    padding:18px 24px;
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;">
+
+                    <strong style="font-size:18px;">
+                        AI PLC Çıktısı
+                    </strong>
+
+                    @if (!string.IsNullOrEmpty(Model.Result))
+                    {
+                        <div style="display:flex; gap:10px; align-items:center;">
+
+                            <button type="button"
+                                    onclick="copyOutput()"
+                                    style="border:1px solid #60a5fa;
+                                background:transparent;
+                                color:#93c5fd;
+                                border-radius:10px;
+                                padding:8px 12px;
+                                cursor:pointer;">
+
+                                Kopyala
+
+                            </button>
+
+                            <form asp-controller="Plc"
+                                  asp-action="DownloadPdf"
+                                  method="post"
+                                  style="margin:0;">
+
+                                <textarea name="result"
+                                          style="display:none;">@Model.Result</textarea>
+
+                                <button type="submit"
+                                        style="border:none;
+                                    background:#dc2626;
+                                    color:white;
+                                    border-radius:10px;
+                                    padding:8px 12px;
+                                    cursor:pointer;">
+
+                                    PDF İndir
+
+                                </button>
+
+                            </form>
+
+                        </div>
+                    }
+
+                </div>
+
+                <div style="min-height:520px;
+                    max-height:720px;
+                    overflow:auto;
+                    padding:26px;
+                    background:#f8fafc;">
+
+                    @if (!string.IsNullOrEmpty(Model.Result))
+                    {
+                        <pre id="plcOutput"
+                             style="white-space:pre-wrap;
+                        font-size:15px;
+                        line-height:1.7;
+                        color:#111827;
+                        font-family:Consolas, monospace;
+                        margin:0;">@Model.Result</pre>
+                    }
+                    else
+                    {
+                        <div style="text-align:center;
+                            color:#64748b;
+                            margin-top:160px;
+                            font-size:18px;">
+
+                            Henüz çıktı oluşturulmadı.
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<style>
+    @@media (max-width: 900px) {
+        div[style*="grid-template-columns"] {
+            grid-template-columns: 1fr !important;
+        }
+    }
+</style>
+
+<script>
+
+    function copyOutput()
+    {
+        const output =
+            document.getElementById("plcOutput");
+
+        if (!output)
+        {
+            alert("Kopyalanacak çıktı bulunamadı.");
+            return;
+        }
+
+        navigator.clipboard.writeText(output.innerText);
+
+        alert("PLC çıktısı kopyalandı.");
+    }
+
+</script>
